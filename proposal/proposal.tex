@@ -1,0 +1,25 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\pagenumbering{gobble}
+\title{CPSC 498 Proposal}
+\author{Steven Rosendahl}
+\date{}
+\begin{document}
+\maketitle
+
+For the capstone project, I would like to implement a Partial Differential Equation solver in C++
+and build bindings to Swift, Java, and JavaScript. The Solver will be able to solve first order
+homogeneous partial differential equations, and homogeneous variants of the classical trinity,
+\[
+u_{tt} - c^{2}u_{xx} = 0, \qquad\qquad u_{t} - ku_{xx} = 0, \qquad\qquad \nabla^{2}u = 0.
+\]
+The solver will assume that the equations are being solved in Cartesian coordinates, and will have
+to be provided with explicit boundary conditions and initial conditions. If the equation cannot be
+solved, the program will respond accordingly.\\
+
+Depending on time constraints, I will either implement a small ordinary differential equations solver,
+or I will use a third party library. This needs to be a feature of the program, since partial differential
+equations are commonly solved by using a technique that yields two ordinary differential equations.
+\end{document}
