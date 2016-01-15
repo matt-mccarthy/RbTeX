@@ -2,12 +2,13 @@
 
 \usepackage{amsmath}
 \usepackage{listings}
+\usepackage{graphicx}
 
 \newcommand{\inlinecode}[1]{\texttt{#1}}
-\newcommand{\luatex}{\inlinecode{luatex}\ }
+\newcommand{\luatex}{\inlinecode{lualatex}\ }
 \newcommand{\findent}{\leavevmode{\parindent=1.3em\indent}}
 
-\def\RbTeX{{\rm\kern-.125emR\!{\scriptsize\lower-.5ex\hbox{B}}\!T\kern-.1667em\lower.5ex\hbox{E}\kern-.125emX}}
+\def\RbTeX{{\rm\kern-.125emR\!{\scalebox{0.7}{\lower-.5ex\hbox{B}}}\!T\kern-.1667em\lower.5ex\hbox{E}\kern-.125emX}}
 
 \topmargin=-1in
 \textheight=9.2in
@@ -16,7 +17,7 @@
 \evensidemargin=-0.2in
 
 \pagenumbering{gobble}
-\title{CPSC 498 Proposal}
+\title{CPSC 498 Proposal: \RbTeX}
 \author{Steven Rosendahl}
 \date{}
 \begin{document}
@@ -29,7 +30,7 @@ functionality as other popular scripting languages, such as Ruby. The goal of th
 incorporate Ruby into \LaTeX\ in a manner similar to \luatex, but with the power and
 simplicity of Ruby over Lua.
 
-\section{Specification}
+\section{Motivation and Description}
 
 \findent The current \luatex specification allows users to use several environments for writing and
 running Lua scripts. In addition, \luatex provides a built in library called \inlinecode{tex} that allows
@@ -44,14 +45,71 @@ addition, users will be provided with several ways in which to interact with Rub
 environment:
 
 \begin{enumerate}
-\item \inlinecode{inrbtex\{\}}: This command will provide a way for a use to execute one line of Ruby code
-at a time, or call a predefined function.
-\item \inlinecode{rbtex\{\}}: This command will provide a way to write multiple lines of Ruby code. Any
-functions defined in this section will be globally defined, so they can be called in the
-\inlinecode{inrbtex\{\}} environment and in other \inlinecode{rbtex\{\}} environments.
+\item \inlinecode{inrbtex\{\}}: This command will provide a way for a use to execute one line of Ruby
+code at a time, or call a predefined function.
+\item \inlinecode{rbtex\{\}}: This command will provide a way to write multiple lines of Ruby code inside
+the \LaTeX\ document. Any functions defined in this section will be globally defined, so they can be
+called in the \inlinecode{inrbtex\{\}} environment and in other \inlinecode{rbtex\{\}} environments. This
+code will be pulled verbatim from the \LaTeX\ file during the pre-processing stage.
+\item \inlinecode{frbtex\{\}}: It may sometimes be convenient for a user to write an external Ruby file
+and call it from the \LaTeX\ file, rather than writing the code. The \inlinecode{frbtex\{\}} macro will
+allow an external script to be loaded into the document. The pre-processor will copy the provided Ruby
+file into the \LaTeX\ document, and will assume that all modules, classes, functions, and variables are
+globally defined.
 \end{enumerate}
 
 The library will come with a program called \inlinecode{rbtex} that complies the provided \LaTeX\
-document, much like the \inlinecode{luatex} command.
+document, much like the \inlinecode{luatex} command.\\
+
+The program will work in four steps. It will first pre-process the \TeX\ file, scanning for the
+appropriate environments. The ruby code will be ripped out and stored in an \inlinecode{.aux} file.
+The next step will order the code in the \inlinecode{.aux} file, and attempt to produce a
+\inlinecode{.rb} file from the provided \LaTeX\ document. In the third step, the code in the
+\inlinecode{.rb} file will be run using the \inlinecode{ruby} command specified in the user's
+\inlinecode{\$PATH} variable. Finally, the post-processor will capture any output specified by the
+\inlinecode{tex} module in the \inlinecode{rbtex} gem, and place it into the \LaTeX\ document. From
+there, \inlinecode{pdflatex} will take over.\\
+
+The pre-processor and post-processor will be written in C++ to allow for quick speed when parsing
+out the Ruby code. Shell script (UNIX) and Batch files (Win) will be provided for calling the
+program. Standard \inlinecode{pdflatex} flags will be available (they will be simply passed to the
+\inlinecode{pdflatex} command at the appropriate time). The final version of the program will be
+accessible through the shell command \inlinecode{rblatex tex\_file.tex --shell-escape} and the Windows
+equivalent.
+
+\section{Tentative Schedule}
+\begin{center}
+\begin{tabular}{| c | l |}
+\hline
+January 19 & Proposal and initial git setup\\
+\hline
+January 26 & Research luatex implementation\\
+\hline
+February 2 & Begin writing pre/post-processor\\
+\hline
+February 9 & Continue writing pre/post-processor\\
+\hline
+February 16 & Continue writing pre/post-processor\\
+\hline
+February 23 & Test pre/post-processor\\
+\hline
+March 1 & Test pre/post-processor\\
+\hline
+March 8 & Build \TeX\ bindings\\
+\hline
+March 15 & Build \TeX\ bindings\\
+\hline
+March 22 & Test entire package\\
+\hline
+March 29 & Build C program to include in \TeX\ package\\
+\hline
+April 5 & Clean and final test code\\
+\hline
+April 12 & Extra space to be used as needed\\
+\hline
+April 19 & Extra space to be used as needed\\
+\hline
+\end{tabular}
+\end{center}
 
 \end{document}
