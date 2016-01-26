@@ -16,3 +16,8 @@ if [[ -e texer.so ]]
 then
 	rm -f texer.so
 fi
+
+if [[ -e rbtex_imdt.rb ]]
+then
+	rm -f rbtex_imdt.rb
+fi
