@@ -14,6 +14,9 @@
 #include "./futil.h"
 #include "../header/includes.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #define RB_AUX ".rtx.aux"
 #define RB_FIL "rbtex_imdt.rb"
 
@@ -23,7 +26,7 @@
 
 class Texer {
 public:
-	Texer(std::string& texFile);
+	Texer(const std::string& texFile);
 	void scan();
 	void preprocess();
 	void rubify();

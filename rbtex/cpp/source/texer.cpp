@@ -4,7 +4,7 @@
 
 #include <stack>
 
-Texer::Texer(std::string& texFile){
+Texer::Texer(const std::string& texFile){
 	file = texFile;
 }
 
@@ -28,6 +28,5 @@ void Texer::scan(){
 				}
 			}
 		}
-
 	}
 }
