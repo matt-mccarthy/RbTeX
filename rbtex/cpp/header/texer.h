@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define RB_AUX ".rtx.aux"
+#define RB_AUX "fd_tmp.rtx.aux"
 #define RB_FIL "rbtex_imdt.rb"
 
 #define RUB_ENV_01_START "\\begin{inrbtex}"
@@ -37,7 +37,6 @@ public:
 	void cleanup();
 private:
 	std::string file;
-	std::map<unsigned long long,std::string> refs;
 };
 
 #endif
