@@ -11,3 +11,8 @@ if [[ -e rbtex ]]
 then
 	rm -f rbtex
 fi
+
+if [[ -e texer.so ]]
+then
+	rm -f texer.so
+fi
