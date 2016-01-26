@@ -1,3 +1,8 @@
+%% Logbook should be in the format
+%% Task | Hours | Notes | Done/Not Done
+%%
+%% Project must be under git revision
+
 \documentclass{article}
 
 \usepackage{amsmath}
@@ -8,7 +13,8 @@
 \newcommand{\luatex}{\inlinecode{lualatex}\ }
 \newcommand{\findent}{\leavevmode{\parindent=1.3em\indent}}
 
-\def\RbTeX{{\rm\kern-.125emR\!{\scalebox{0.7}{\lower-.5ex\hbox{B}}}\!T\kern-.1667em\lower.5ex\hbox{E}\kern-.125emX}}
+\def\RbTeX{{\rm\kern-.125emR\!{\scalebox{0.7}{\lower-.5ex\hbox{B}}}\!T\kern-.1667em\lower.5ex\hbox
+{E}\kern-.125emX}}
 
 \topmargin=-1in
 \textheight=9.2in
@@ -24,58 +30,84 @@
 \maketitle
 \section{Abstract}
 
-\findent Modern \LaTeX\ distributions include a tool called \luatex that allows users to dynamically
-produce content via use of Lua code. Unfortunately, the Lua standard libraries do not have as much
-functionality as other popular scripting languages, such as Ruby. The goal of this project is to
-incorporate Ruby into \LaTeX\ in a manner similar to \luatex, but with the power and
-simplicity of Ruby over Lua.
+\findent Modern \LaTeX\ distributions include a tool called \luatex that allows users to
+dynamically produce content via use of Lua code. Unfortunately, the Lua standard libraries do not
+have as much functionality as other popular scripting languages, such as Ruby. The goal of this
+project is to incorporate Ruby into \LaTeX\ in a manner similar to \luatex, but with the power and
+simplicity of Ruby over Lua.\\
+
+One of the main benefits of having the ability to dynamically produce \LaTeX\ code is that
+difficult mathematical problems can be solved using a high level language. Ruby's syntax is
+simplistic enough to make up for the fact that the \TeX\ syntax is verbose; a gem will be provided
+to perform some mathematical operations and present the result in \LaTeX.
 
 \section{Motivation and Description}
+\subsection{\LaTeX and Ruby}
 
-\findent The current \luatex specification allows users to use several environments for writing and
-running Lua scripts. In addition, \luatex provides a built in library called \inlinecode{tex} that allows
-output to be printed straight to the \LaTeX\ document. The library, called \RbTeX, will provide similar
-functionality through a gem called \inlinecode{rbtex}. In addition, the entire Ruby standard library will
-be available for use; \RbTeX\ documents that need to interact directly with the system will most likely
-need to be compiled using the \inlinecode{--shell-escape} flag.\\
+\findent The current \luatex specification allows users to use several environments for writing
+and running Lua scripts. In addition, \luatex provides a built in library called \inlinecode{tex}
+that allows output to be printed straight to the \LaTeX\ document. The library, called \RbTeX,
+will provide similar functionality through a gem called \inlinecode{rbtex}. In addition, the
+entire Ruby standard library will be available for use; \RbTeX\ documents that need to interact
+directly with the system will most likely need to be compiled using the
+\inlinecode{--shell-escape} flag.\\
 
-To use the library, users will need to have a Ruby version in the path. The code will be pre-processed,
-and inserted directly into the \TeX\ code before \inlinecode{pdflatex} is called on the document. In
-addition, users will be provided with several ways in which to interact with Ruby from the \TeX\
-environment:
+To use the library, users will need to have a Ruby version in the path. The code will be
+pre-processed, and inserted directly into the \TeX\ code before \inlinecode{pdflatex} is called on
+the document. In addition, users will be provided with several ways in which to interact with Ruby
+from the \TeX\ environment:
 
 \begin{enumerate}
-\item \inlinecode{inrbtex\{\}}: This command will provide a way for a use to execute one line of Ruby
-code at a time, or call a predefined function.
-\item \inlinecode{rbtex\{\}}: This command will provide a way to write multiple lines of Ruby code inside
-the \LaTeX\ document. Any functions defined in this section will be globally defined, so they can be
-called in the \inlinecode{inrbtex\{\}} environment and in other \inlinecode{rbtex\{\}} environments. This
-code will be pulled verbatim from the \LaTeX\ file during the pre-processing stage.
-\item \inlinecode{frbtex\{\}}: It may sometimes be convenient for a user to write an external Ruby file
-and call it from the \LaTeX\ file, rather than writing the code. The \inlinecode{frbtex\{\}} macro will
-allow an external script to be loaded into the document. The pre-processor will copy the provided Ruby
-file into the \LaTeX\ document, and will assume that all modules, classes, functions, and variables are
-globally defined.
+\item \inlinecode{rbtex\{\}}: This command will provide a way to write multiple lines of Ruby code
+inside the \LaTeX\ document. Any functions defined in this section will be globally defined, so
+they can be called in the \inlinecode{inrbtex\{\}} environment and in other \inlinecode{rbtex\{\}}
+environments. This code will be pulled verbatim from the \LaTeX\ file during the pre-processing
+stage.
+\item \inlinecode{frbtex\{\}}: It may sometimes be convenient for a user to write an external Ruby
+file and call it from the \LaTeX\ file, rather than writing the code. The \inlinecode{frbtex\{\}}
+macro will allow an external script to be loaded into the document. The pre-processor will copy
+the provided Ruby file into the \LaTeX\ document, and will assume that all modules, classes,
+functions, and variables are globally defined.
 \end{enumerate}
 
 The library will come with a program called \inlinecode{rbtex} that complies the provided \LaTeX\
 document, much like the \inlinecode{luatex} command.\\
 
 The program will work in four steps. It will first pre-process the \TeX\ file, scanning for the
-appropriate environments. The ruby code will be ripped out and stored in an \inlinecode{.aux} file.
-The next step will order the code in the \inlinecode{.aux} file, and attempt to produce a
+appropriate environments. The ruby code will be ripped out and stored in an \inlinecode{.aux}
+file. The next step will order the code in the \inlinecode{.aux} file, and attempt to produce a
 \inlinecode{.rb} file from the provided \LaTeX\ document. In the third step, the code in the
 \inlinecode{.rb} file will be run using the \inlinecode{ruby} command specified in the user's
 \inlinecode{\$PATH} variable. Finally, the post-processor will capture any output specified by the
-\inlinecode{tex} module in the \inlinecode{rbtex} gem, and place it into the \LaTeX\ document. From
-there, \inlinecode{pdflatex} will take over.\\
+\inlinecode{tex} module in the \inlinecode{rbtex} gem, and place it into the \LaTeX\ document.
+From there, \inlinecode{pdflatex} will take over.\\
 
 The pre-processor and post-processor will be written in C++ to allow for quick speed when parsing
 out the Ruby code. Shell script (UNIX) and Batch files (Win) will be provided for calling the
 program. Standard \inlinecode{pdflatex} flags will be available (they will be simply passed to the
 \inlinecode{pdflatex} command at the appropriate time). The final version of the program will be
-accessible through the shell command \inlinecode{rblatex tex\_file.tex --shell-escape} and the Windows
-equivalent.
+accessible through the shell command \inlinecode{rbtex tex\_file.tex} and the Windows equivalent.
+
+\subsection{Ruby and Math}
+Ruby includes several mathematical utilities that are sufficient to solve simple math problems.
+However, Ruby lacks the power to solve higher level problems, such as Ordinary Differential
+Equations and even Partial Differential Equations. This package will include a gem called
+\inlinecode{rbtexm} that will have several features geared towards mathematics:
+\begin{enumerate}
+\item ODE Solver: The gem will include a module that can solve a wide variety of first and second
+order ODE's. If it runs into an ODE that it cannot solve, it will gracefully exit.
+\item PDE Solver: This module will allow for simple first and second order PDE's to be solved. It
+will have functionality to solve only homogeneous PDE's.
+\item Integration: This module will allow for integration of functions, when possible.
+\item Differentiation: A simple module to differentiate functions.
+\item Logic: This module will be able to solve binary logic problems. It will return a truth table
+that has all possible outcomes.
+\end{enumerate}
+
+Time permitting, more mathematical modules will be added. All the models will provide a way to
+output \LaTeX\ code for use in the document; however, the math module should be able to be used
+independent of \LaTeX. The methods available will take in strings of \LaTeX\ code. The gem will
+either contain a small \LaTeX\ parser, or will include a third party one.
 
 \section{Tentative Schedule}
 \begin{center}
@@ -83,27 +115,27 @@ equivalent.
 \hline
 January 19 & Proposal and initial git setup\\
 \hline
-January 26 & Research luatex implementation\\
+January 26 & Building C++ preprocessor\\
 \hline
-February 2 & Begin writing pre/post-processor\\
+February 2 & Building C++ postprocessor\\
 \hline
-February 9 & Continue writing pre/post-processor\\
+February 9 & Building \inlinecode{rbtex} gem\\
 \hline
-February 16 & Continue writing pre/post-processor\\
+February 16 & Begin writing \inlinecode{rbtexm} gem\\
 \hline
-February 23 & Test pre/post-processor\\
+February 23 & Build small \LaTeX\ parser\\
 \hline
-March 1 & Test pre/post-processor\\
+March 1 & Build calculus related utilities\\
 \hline
-March 8 & Build \TeX\ bindings\\
+March 8 & Build calculus related utiltites\\
 \hline
-March 15 & Build \TeX\ bindings\\
+March 15 & Build logic related utilities\\
 \hline
-March 22 & Test entire package\\
+March 22 & Build any extra mathematical utilties\\
 \hline
-March 29 & Build C program to include in \TeX\ package\\
+March 29 & Testing\\
 \hline
-April 5 & Clean and final test code\\
+April 5 & Packaging for Windows, OS X, and Linux\\
 \hline
 April 12 & Extra space to be used as needed\\
 \hline
