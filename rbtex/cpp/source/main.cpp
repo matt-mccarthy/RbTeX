@@ -22,7 +22,7 @@ int main(int argc, const char** argv){
 		cout << "Failed to rubify code" << endl;
 		return -1;
 	}
-	texer->cleanup();
+	// texer->cleanup();
 	delete texer;
 	return 0;
 }

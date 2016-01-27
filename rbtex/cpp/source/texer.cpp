@@ -15,15 +15,21 @@ Texer::Texer(const std::string& texFile){
 void Texer::scan(){
 	std::ifstream scanner(file);
 	std::ofstream writer(RB_FIL);
+	unsigned long long lino = 0;
 	if(writer.is_open() && scanner.is_open()){
 		std::string line;
 		while(std::getline(scanner,line)){
+			lino++;
 			if(sutl::contains(RUB_ENV_02_START,line)){
+				writer << "##--!! " << lino << std::endl;
 				while(getline(scanner,line)){
+					lino++;
 					if(sutl::contains(RUB_ENV_02_END,line))
 						break;
 					writer << line << std::endl;
 				}
+				writer << "##--!! " << lino << std::endl;
+				writer << std::endl;
 			} else if (sutl::contains(RUB_ENV_03_START,line)){
 				size_t s = line.find("{");
 				size_t e = line.find("}");

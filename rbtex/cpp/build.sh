@@ -44,3 +44,5 @@ echo "Compiling main.cpp..."
 g++ -o ../exec/rbtex ${OBJS::-1} main.cpp
 check "compile main.cpp"
 echo "DONE!"
+
+exit 0
