@@ -1,9 +1,9 @@
-module tex
+module Tex
 	RB_AUX_FILE = 'fd_tmp.rtx.aux'
 	RB_TMP_LINE_DELIM = '##--!!'
 	LATEX_TMP_LINE_DELIM = '%%--!!'
 
-	def tex.print (latex)
+	def Tex.print (latex)
 		writeToAuxFile(latex)
 	end
 
