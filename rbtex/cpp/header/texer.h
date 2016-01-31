@@ -17,8 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define RB_AUX "fd_tmp.rtx.aux"
-#define RB_FIL "rbtex_imdt.rb"
+#define RB_OUTPUT "_rbtex.out.aux"
+#define RB_FIL "_rbtex.rb"
+
+#define REQUIRE_01 "require 'rbtex'"
+#define RB_LINE_NUM_DELIM "#!!~~"
 
 #define RUB_ENV_01_START "\\begin{inrbtex}"
 #define RUB_ENV_01_END "\\end{inrbtex}"
@@ -37,6 +40,8 @@ public:
 	void cleanup();
 private:
 	std::string file;
+	std::string auxFile;
+	std::string rubyFile;
 };
 
 #endif

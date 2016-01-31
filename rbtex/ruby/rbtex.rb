@@ -1,10 +1,19 @@
+require 'rubygems'
+require 'ffi'
+
 module Tex
-	RB_AUX_FILE = 'fd_tmp.rtx.aux'
-	RB_TMP_LINE_DELIM = '##--!!'
-	LATEX_TMP_LINE_DELIM = '%%--!!'
+	extend FFI::Library
+	ffi_lib FFI::Library::LIBC
+	attach_function :postprocess
+
+	RB_AUX_FILE = '_rbtex.out.aux'
 
 	def Tex.print (latex)
 		writeToAuxFile(latex)
+	end
+
+	def Tex.return_control()
+		Tex.postprocess()
 	end
 
 	def writeToAuxFile (content)

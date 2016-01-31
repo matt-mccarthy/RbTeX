@@ -42,7 +42,7 @@ cd ./source
 
 echo "Compiling main.cpp..."
 g++ -o ../exec/rbtex ${OBJS::-1} main.cpp
-cp ../exec/rbtex ../../product/	
+# cp ../exec/rbtex ../../product/	
 check "compile main.cpp"
 echo "DONE!"
 
