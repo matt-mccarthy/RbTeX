@@ -1,0 +1,175 @@
+#!/usr/local/bin/ruby
+
+################################################################################
+#
+# rblatex -- The RbTeX processor.
+#
+# @author  Steven Rosendahl
+# @version 0.0.2
+#
+# This is the processor for the RbTeX package. This processor does not handle
+# any of the TeX heavy lifting; rather, the processor only looks for certain
+# environments in a supplied TeX document. After several steps, control is
+# returned back over to TeX, where pdflatex is called on the generated .rtx
+# file. If no rbtex environments were found, then this program tells pdflatex
+# to compile the original document.
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2016 Steven Rosendahl
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+################################################################################
+
+TEX_ENV_01_S = '\\begin{rbtex}'
+TEX_ENV_01_E = '\\end{rbtex}'
+
+TEX_FILE = ARGV[0];                 # The user supplied TeX document
+RB_FILE = "#{TEX_FILE}.rb"          # The generated Ruby File
+RBTEX_OUT = "#{TEX_FILE}.aux.rtx"   # The generated output file
+RBTEX_FILE = "#{TEX_FILE}.rtx"      # The generated TeX File
+$rbenvs = 0;                        # The number of rbtex environments found
+
+def main
+    if TEX_FILE
+        result = 0
+        puts 'Welcome to rblatex v0.0.2!'
+        puts "Beginning to preprocess #{TEX_FILE}"
+        result = preprocess
+        if result == 0
+            if $rbenvs > 0
+                puts "#{$rbenvs} RbTeX envrioment(s) found"
+                puts 'Beginning interpretation of Ruby code!'
+                result = interp
+                if result == 0
+                    result = postprocess
+                else
+                    puts 'Failed to interpret.'
+                    puts 'Check stdio for the error.'
+                    return 2
+                end
+            else
+                puts 'No uses of RbTeX found'
+                puts 'Falling back to LaTeX with a --shell-escape'
+            end
+        else
+            puts 'Failed to preprocess for some reason.'
+            puts 'Did you supply a valid file?'
+            return 2
+        end
+        if result == 0
+            puts 'Giving control over to pdflatex.'
+            puts 'Thank you for choosing RbTeX!'
+            latexit
+            return 0
+        else
+            puts 'Failed to postprocess.'
+            puts 'This is likely RbTeX\'s fault :('
+            return 2
+        end
+    else
+        puts 'No TeX file supplied. Try again with a valid TeX file!'
+    end
+end
+
+################################################################################
+# def preprocess
+#
+# Handles the inital ripping of code from the original TeX document supplied by
+# the user. Upon successful completion, the method will return 0.
+#
+################################################################################
+def preprocess
+    lineno = 0
+    shouldWrite = false
+    printer = File.open(RB_FILE,'w')
+    scanner = File.open(TEX_FILE,'r')
+    if printer && scanner
+        scanner.each_line do |line|
+            lineno = lineno + 1
+            if (line.include? TEX_ENV_01_E) && !(line.include? "\%")
+                puts "Encountered #{TEX_ENV_01_E} on line #{lineno}"
+                shouldWrite = false
+            end
+            if shouldWrite
+                printer.puts "#{line} \#~~!! #{lineno}"
+            end
+            if (line.include? TEX_ENV_01_S) && !(line.include? "\%")
+                puts "Encountered #{TEX_ENV_01_S} on line #{lineno}"
+                $rbenvs = $rbenvs + 1
+                shouldWrite = true
+            end
+        end
+    end
+    printer.close
+    scanner.close
+    return 0
+end
+
+################################################################################
+# def interp
+#
+# Runs the generated ruby file. This function returns the result of the system's
+# ruby call.
+#
+################################################################################
+def interp
+    return `ruby #{RB_FILE} #{RBTEX_OUT}`
+end
+
+################################################################################
+# def postprocess
+#
+# Generates a new LaTeX document for compilation via pdflatex. This function
+# will return 0 upon successful completion.
+#
+################################################################################
+def postprocess
+    scannerA = File.open(RBTEX_OUT,'r')
+    scannerB = File.open(TEX_FILE,'r')
+    printer = File.open(RBTEX_FILE,'w')
+
+    printer.close
+    scannerB.close
+    scannerA.close
+    return 0
+end
+
+################################################################################
+# def latexit
+#
+# Runs pdflatex on the generated TeX file.
+################################################################################
+def latexit
+    if $rbenvs > 0
+        `pdflatex --shell-escape #{RBTEX_FILE}`
+    else
+        `pdflatex --shell-escape #{TEX_FILE}`
+    end
+end
+
+################################################################################
+# def getLineFromString(line)
+#
+# Returns the RbTeX stored line number on a line.
+################################################################################
+def getLineFromString(line)
+    return line.slice!(line.index("\#~~!!") + 6)
+end
+
+main
