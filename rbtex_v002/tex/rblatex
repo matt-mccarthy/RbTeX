@@ -160,9 +160,9 @@ end
 ################################################################################
 def latexit
     if $rbenvs > 0
-        puts `pdflatex --shell-escape #{RBTEX_FILE}`
+        `pdflatex --shell-escape #{RBTEX_FILE}`
     else
-        puts `pdflatex --shell-escape #{TEX_FILE}`
+        `pdflatex --shell-escape #{TEX_FILE}`
     end
 end
 

@@ -1,0 +1,1 @@
+cp ./ruby/rblatex ./tex/
