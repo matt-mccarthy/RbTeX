@@ -39,11 +39,14 @@
 TEX_ENV_01_S = '\\begin{rbtex}'
 TEX_ENV_01_E = '\\end{rbtex}'
 
+RB_REQUIRE = "require './rbtex'"
+
 TEX_FILE = ARGV[0];                 # The user supplied TeX document
 RB_FILE = "#{TEX_FILE}.rb"          # The generated Ruby File
 RBTEX_OUT = "#{TEX_FILE}.aux.rtx"   # The generated output file
 RBTEX_FILE = "#{TEX_FILE}.rtx"      # The generated TeX File
 $rbenvs = 0;                        # The number of rbtex environments found
+$envlines = []                      # The locations of various RbTeX lines
 
 def main
     if TEX_FILE
@@ -100,18 +103,18 @@ def preprocess
     printer = File.open(RB_FILE,'w')
     scanner = File.open(TEX_FILE,'r')
     if printer && scanner
+        printer.puts RB_REQUIRE
         scanner.each_line do |line|
             lineno = lineno + 1
-            if (line.include? TEX_ENV_01_E) && !(line.include? "\%")
+            if (line.include? TEX_ENV_01_E) && !determineIfCommented(line, TEX_ENV_01_E)
                 puts "Encountered #{TEX_ENV_01_E} on line #{lineno}"
                 shouldWrite = false
             end
             if shouldWrite
-                # puts "#{line} \#~~!! #{lineno}"
-                # printer.print "#{line} \#~~!! #{lineno}"
-                printer.puts "#{line.strip!} #~~!! #{lineno}"
+                printer.puts "#{line.strip} #~~!! #{lineno}"
+                $envlines.push lineno
             end
-            if (line.include? TEX_ENV_01_S) && !(line.include? "\%")
+            if (line.include? TEX_ENV_01_S) && !determineIfCommented(line, TEX_ENV_01_S)
                 puts "Encountered #{TEX_ENV_01_S} on line #{lineno}"
                 $rbenvs = $rbenvs + 1
                 shouldWrite = true
@@ -146,7 +149,16 @@ def postprocess
     scannerA = File.open(RBTEX_OUT,'r')
     scannerB = File.open(TEX_FILE,'r')
     printer = File.open(RBTEX_FILE,'w')
+    # This is a bad idea for this ;; change this later
+    currLine = 1
+    texLine = 0
+    i = 0
+    rbtexOutContents = scannerA.readlines
+    scannerB.each do |line|
+        if (line.include? TEX_ENV_01_S) && !(line.include? "\%")
 
+        end
+    end
     printer.close
     scannerB.close
     scannerA.close
@@ -173,6 +185,10 @@ end
 ################################################################################
 def getLineFromString(line)
     return line.slice!(line.index("\#~~!!") + 6)
+end
+
+def determineIfCommented(line, haystack)
+    return line.index("\%") < line.index(haystack)
 end
 
 main
