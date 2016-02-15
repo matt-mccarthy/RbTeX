@@ -1,5 +1,3 @@
 require './rbtex'
-string = "Hello Steven"
-Tex.print "#{string}", 8
-Tex.print "\\[\\frac{\\nabla F}{9}\\]", 9
-Tex.imath "{\\nabla^{2}u}", 10
+a = [[1,2,3,4],[1,2,3,4]]
+Tex.print (Tex.center (Tex.table a)), 8

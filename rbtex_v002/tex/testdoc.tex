@@ -4,10 +4,11 @@
 \begin{document}
 
 \begin{rbtex}
-string = "Hello Steven"
-Tex.print "#{string}"
-Tex.print "\\[\\frac{\\nabla F}{9}\\]"
-Tex.imath "{\\nabla^{2}u}"
+a = [[1,2,3,4],[1,2,3,4]]
+Tex.print (Tex.center (Tex.table a))
 \end{rbtex}
+
+
+% This is native \LaTeX\ !
 
 \end{document}

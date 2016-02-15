@@ -41,6 +41,8 @@ TEX_ENV_01_E = '\\end{rbtex}'
 
 RB_REQUIRE = "require './rbtex'"
 
+OUT_DELIM = "\u00b6".encode('utf-8')
+
 TEX_FILE = ARGV[0];                                         # The user supplied TeX document
 RB_FILE = "#{TEX_FILE}.rb"                                  # The generated Ruby File
 RBTEX_OUT = "#{TEX_FILE}.aux.rtx"                           # The generated output file
@@ -78,10 +80,7 @@ def main
         if result == 0
             puts 'Giving control over to pdflatex.'
             puts 'Thank you for choosing RbTeX!'
-            # fork {
-                latexit
-                # exit 0
-            # }
+            latexit
             return 0
         else
             puts 'Failed to postprocess.'
@@ -142,7 +141,12 @@ end
 #
 ################################################################################
 def interp
-    puts `ruby #{RB_FILE} #{RBTEX_OUT}`
+    rboutput = `ruby #{RB_FILE} #{RBTEX_OUT}`
+    if rboutput != ''
+        puts rboutput
+    else
+        puts 'No output produced from ruby. Moving on...'
+    end
     return 0
 end
 
@@ -166,7 +170,7 @@ def postprocess
 
     scannerB.each_line do |line|
         if csvcount < csv.length
-            sline = csv[csvcount].split(',')
+            sline = csv[csvcount].split(OUT_DELIM)
             repline = sline[0]
             replineno = sline[1].to_i
         else
@@ -178,7 +182,7 @@ def postprocess
         if !inRb
             printer.puts line
         elsif lineno == replineno
-            puts "Injecting into rtx file"
+            puts "Injecting '#{repline}' into rtx file"
             printer.puts repline
             csvcount = csvcount + 1
         end
@@ -190,6 +194,7 @@ def postprocess
 
     printer.close
     scannerB.close
+    puts 'Finishing postprocess'
     return 0
 end
 
