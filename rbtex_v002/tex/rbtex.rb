@@ -12,12 +12,12 @@ module Tex
         printToOutFile latex, number
     end
 
-    def Tex.imath(math, number)
-        printToOutFile "$#{math}$", number
+    def Tex.imath(math)
+        return "$#{math}$"
     end
 
-    def Tex.cmath(math, number)
-        printToOutFile "\\[#{math}\\]", number
+    def Tex.cmath(math)
+        return "\\[#{math}\\]"
     end
 
     def Tex.center(latex)

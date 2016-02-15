@@ -20,7 +20,8 @@ RbTeX comes with some useful methods available.
 | `print`  | prints the provided string to the TeX document | :heavy_check_mark: |
 | `imath`  | wraps the provided string in an inline math mode environment| :heavy_check_mark: |
 | `cmath`  | wraps the provided string in an equation environment | :heavy_check_mark: |
-| `table`  | forms a table from the provided 2D array | :x: |
+| `table`  | forms a table from the provided 2D array | :heavy_check_mark: |
+| `center` | centers the provided line | :heavy_check_mark: |
 
 Below are some examples of RbTeX.
 
@@ -28,14 +29,15 @@ Below are some examples of RbTeX.
 #print a sentence to the TeX document
 Tex.print "\\textbf{THIS IS BOLDED TEXT}"
 #print something in math mode
-Tex.print "$\\sum_{n=1}^{\\infty}a_{n}p_{n}(x)$"
-Tex.imath "\\sum_{n=1}^{\\infty}a_{n}p_{n}(x)"
+Tex.print (Tex.imath "\\sum_{n=1}^{\\infty}a_{n}p_{n}(x)")
 #print a centered equation in math mode
-Tex.print "\\[L[f]=\\int_{0}^{\\infty}fe^{-st}dt\\]"
-Tex.cmath "L[f]=\\int_{0}^{\\infty}fe^{-st}dt"
+Tex.print (Tex.cmath "L[f]=\\int_{0}^{\\infty}fe^{-st}dt")
 #create a table from an array
 table = [['a','b','c','d'],['e','f','g','h']]
-Tex.table table
+mtab = Tex.table table
+Tex.print mtab
+#center the table you just created
+Tex.print (Tex.center mtab)
 ```
 In addition, there are several Mathematica-esque modules built into RbTeX that contribute to
 the whole "this is really just a calculator" philosophy. All inputs to the `Rbt` module are
@@ -53,11 +55,11 @@ And here are some use cases:
 ```ruby
 #integrate f(x) = x^2
 res = Rbt.integrate "x^{2}", "x"
-Tex.cmath res
+Tex.print (Tex.cmath res)
 #differentiate f(x) = cos(x)
 res = Rbt.diff "\\cos{x}", "x"
-Tex.cmath "{d\\over dx}\\cos{x}=#{res}"
+Tex.print (Tex.cmath "{d\\over dx}\\cos{x}=#{res}")
 #solve y''(x) + y(x) = 0
 res = Rbt.dolve "y^{''}(x)+y(x)=0", "y", "x"
-Tex.cmath "#{res}"
+Tex.print (Tex.cmath "#{res}")
 ```
