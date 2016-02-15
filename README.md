@@ -12,7 +12,52 @@ its Turing completeness, it's just not built for dynamic programming. Sure, ther
 but no one really uses Lua, and the Lua standard libraries are very lacking in power. This
 project is dedicated to bringing the power of Ruby to LaTeX.  
 
-# Building
-Please don't until everything is as it should be. Right now this project is incredibly messy, and
-I can't promise that the project will build from commit to commit. Eventually I'll change this,
-and a stable release will be out there, and the power of RbTeX will be at your fingertips.
+# Using RbTeX
+RbTeX comes with some useful methods available.  
+
+| Tex. | Description | Implemented? |
+| -------- | --------------- | ------ |
+| `print`  | prints the provided string to the TeX document | :heavy_check_mark: |
+| `imath`  | wraps the provided string in an inline math mode environment| :heavy_check_mark: |
+| `cmath`  | wraps the provided string in an equation environment | :heavy_check_mark: |
+| `table`  | forms a table from the provided 2D array | :x: |
+
+Below are some examples of RbTeX.
+
+```ruby
+#print a sentence to the TeX document
+Tex.print "\\textbf{THIS IS BOLDED TEXT}"
+#print something in math mode
+Tex.print "$\\sum_{n=1}^{\\infty}a_{n}p_{n}(x)$"
+Tex.imath "\\sum_{n=1}^{\\infty}a_{n}p_{n}(x)"
+#print a centered equation in math mode
+Tex.print "\\[L[f]=\\int_{0}^{\\infty}fe^{-st}dt\\]"
+Tex.cmath "L[f]=\\int_{0}^{\\infty}fe^{-st}dt"
+#create a table from an array
+table = [['a','b','c','d'],['e','f','g','h']]
+Tex.table table
+```
+In addition, there are several Mathematica-esque modules built into RbTeX that contribute to
+the whole "this is really just a calculator" philosophy. All inputs to the `Rbt` module are
+formatted as TeX code, and all the functions return TeX code.
+
+| Rbt. | Description | Implemented? |
+|------|-------------|--------------|
+|`integrate`|preforms integration on the provided TeX styled equation.| :x:|
+|`diff`|determines the derivative of the provided function with respect to the provided variable|:x:|
+|`dolve`|attempts to solve the differential equation with respect to the provided variable|:x:|
+|`polve`|attempts to solve the very basic partial differential equation with repect to the provided array of variables|:x:|
+|`truth`|generates a truth table given an expression and a list of variables|:x:|
+
+And here are some use cases:
+```ruby
+#integrate f(x) = x^2
+res = Rbt.integrate "x^{2}", "x"
+Tex.cmath res
+#differentiate f(x) = cos(x)
+res = Rbt.diff "\\cos{x}", "x"
+Tex.cmath "{d\\over dx}\\cos{x}=#{res}"
+#solve y''(x) + y(x) = 0
+res = Rbt.dolve "y^{''}(x)+y(x)=0", "y", "x"
+Tex.cmath "#{res}"
+```
