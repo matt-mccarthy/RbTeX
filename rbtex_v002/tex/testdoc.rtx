@@ -1,0 +1,10 @@
+\documentclass{article}
+\usepackage{rubylatex}
+
+\begin{document}
+
+Hello Steven
+\[\frac{\nabla F}{9}\]
+${\nabla^{2}u}$
+
+\end{document}

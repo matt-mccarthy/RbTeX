@@ -78,9 +78,10 @@ def main
         if result == 0
             puts 'Giving control over to pdflatex.'
             puts 'Thank you for choosing RbTeX!'
-            fork {
+            # fork {
                 latexit
-            }
+                # exit 0
+            # }
             return 0
         else
             puts 'Failed to postprocess.'
@@ -114,10 +115,12 @@ def preprocess
             end
             if shouldWrite
                 stripped = line.strip
-                printer.puts "#{stripped} #~~!! #{lineno}"
-                if (line.include? "Tex") && !determineRubyCommented(line)
+                printer.print "#{stripped}"
+                if (line.include? "Tex") && !determineRubyCommented(line, "Tex")
                     $envlines.push lineno
+                    printer.print ", #{lineno}"
                 end
+                printer.puts ""
             end
             if (line.include? TEX_ENV_01_S) && !determineTexCommented(line, TEX_ENV_01_S)
                 puts "Encountered #{TEX_ENV_01_S} on line #{lineno}"
@@ -154,28 +157,39 @@ def postprocess
     scannerB = File.open(TEX_FILE,'r')
     printer = File.open(RBTEX_FILE,'w')
 
+    csv = File.readlines RBTEX_OUT
+    lineno = 1
+    csvcount = 0
     inRb = false
-
-    # puts "spliced is #{spliced}"
-
-    # printer.puts "%& -job-name=#{spliced}"
+    repline = ""
+    replineno = -1
 
     scannerB.each_line do |line|
-        if (line.include? TEX_ENV_01_E) && !determineTexCommented(line, TEX_ENV_01_E)
-            inRb = false
-        end
-        if !inRb
-            printer.puts line
+        if csvcount < csv.length
+            sline = csv[csvcount].split(',')
+            repline = sline[0]
+            replineno = sline[1].to_i
+        else
+            csvcount = -1
         end
         if (line.include? TEX_ENV_01_S) && !determineTexCommented(line, TEX_ENV_01_S)
             inRb = true
         end
+        if !inRb
+            printer.puts line
+        elsif lineno == replineno
+            puts "Injecting into rtx file"
+            printer.puts repline
+            csvcount = csvcount + 1
+        end
+        if (line.include? TEX_ENV_01_E) && !determineTexCommented(line, TEX_ENV_01_E)
+            inRb = false
+        end
+        lineno = lineno + 1
     end
 
     printer.close
     scannerB.close
-
-    # scannerA = File.open(RBTEX_OUT,'r')
     return 0
 end
 
