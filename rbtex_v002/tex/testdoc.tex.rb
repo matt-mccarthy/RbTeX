@@ -1,3 +1,20 @@
 require './rbtex'
-a = [[1,2,3,4],[1,2,3,4]]
-Tex.print (Tex.center (Tex.table a)), 8
+
+def printGrahm rbtexinsertedlinenumber
+tstr = "3^{"
+
+i = 0
+while i < 64
+tstr << "3^{"
+i = i + 1
+end
+tstr << "3"
+while i >= 0
+tstr << "}"
+i = i - 1
+end
+Tex.print Tex.cmath(tstr), rbtexinsertedlinenumber
+end
+
+printGrahm 24
+
