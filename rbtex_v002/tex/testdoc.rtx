@@ -3,9 +3,15 @@
 
 \begin{document}
 
-\[3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3^{3}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}\]
 
 
-% This is native \LaTeX\ !
+This is native \LaTeX\ !
+
+hello, world!
+
+We are about to use a class inside a module. This should be fun!\\
+
+class initialized!
+doing thing...
 
 \end{document}

@@ -5,15 +5,15 @@
 
 \begin{rbtex}
 
-def printGrahm
-    tstr = "3^{"
+def printGrahm num
+    tstr = "#{num}^{"
 
     i = 0
     while i < 64
-        tstr << "3^{"
+        tstr << "#{num}^{"
         i = i + 1
     end
-    tstr << "3"
+    tstr << "#{num}"
     while i >= 0
         tstr << "}"
         i = i - 1
@@ -21,11 +21,42 @@ def printGrahm
     Tex.print Tex.cmath(tstr)
 end
 
-printGrahm
-
 \end{rbtex}
 
 
-% This is native \LaTeX\ !
+This is native \LaTeX\ !
+
+\begin{rbtex}
+module TM
+
+    def TM.hw
+        Tex.print ('hello, world!')
+    end
+
+    class TestClass
+
+        def initialize
+            Tex.print 'class initialized!'
+        end
+
+        def doThing(arg0)
+            Tex.print 'doing thing...'
+            Tex.print "Here's arg0 #{arg0}"
+        end
+
+    end
+
+end
+
+TM.hw
+\end{rbtex}
+
+We are about to use a class inside a module. This should be fun!\\
+
+\begin{rbtex}
+puts 'hello, world!'
+mtm = TM::TestClass.new
+mtm.doThing "afhalkdjfhaslkdj"
+\end{rbtex}
 
 \end{document}

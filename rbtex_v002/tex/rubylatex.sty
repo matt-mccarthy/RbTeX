@@ -23,16 +23,19 @@
 \NeedsTeXFormat{LaTeX2e}[1994/12/01]
 \ProvidesPackage{rubylatex}[2015/01/20 RbTeX Envs and Macros]
 
-\def\RbTeX{{%
-\rm\kern-.125emR\!{\scalebox{0.7}{%
-\lower-.5ex\hbox{B}}}\!T\kern-.1667em\lower.5ex\hbox{E}\kern-.125emX}}
+\newcommand{\RbTeX}{{{\rm\kern-.125emR\!{\scalebox{0.7}{%
+\lower-.5ex\hbox{B}}}\!T\kern-.1667em\lower.5ex\hbox{E}\kern-.125emX}}}
 
-\newenvironment{inrbtex}{}
+% \newcommand{frbtex}[1]{\verbatiminput{#1}}
 
 \newenvironment{rbtex}{}
+% {%
+% \begin{verbatim}
+% }%
+% {%
+% \end{verbatim}
+% }
 
-% \newcommand{frbtex}[1]
-
-\endinput
+% \endinput
 %%
 %% End of file `rubylatex.sty'.

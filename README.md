@@ -12,7 +12,7 @@ its Turing completeness, it's just not built for dynamic programming. Sure, ther
 but no one really uses Lua, and the Lua standard libraries are very lacking in power. This
 project is dedicated to bringing the power of Ruby to LaTeX.  
 
-# Using RbTeX
+# Using Tex
 RbTeX comes with some useful methods available.  
 
 | Tex. | Description | Implemented? |
@@ -20,10 +20,9 @@ RbTeX comes with some useful methods available.
 | `print`  | prints the provided string to the TeX document | :heavy_check_mark: |
 | `imath`  | wraps the provided string in an inline math mode environment| :heavy_check_mark: |
 | `cmath`  | wraps the provided string in an equation environment | :heavy_check_mark: |
-| `table`  | forms a table from the provided 2D array | :heavy_check_mark: |
 | `center` | centers the provided line | :heavy_check_mark: |
 
-Below are some examples of RbTeX.
+### Basic examples
 
 ```ruby
 #print a sentence to the TeX document
@@ -32,13 +31,19 @@ Tex.print "\\textbf{THIS IS BOLDED TEXT}"
 Tex.print (Tex.imath "\\sum_{n=1}^{\\infty}a_{n}p_{n}(x)")
 #print a centered equation in math mode
 Tex.print (Tex.cmath "L[f]=\\int_{0}^{\\infty}fe^{-st}dt")
-#create a table from an array
-table = [['a','b','c','d'],['e','f','g','h']]
-mtab = Tex.table table
 Tex.print mtab
 #center the table you just created
 Tex.print (Tex.center mtab)
 ```
+
+### Tables
+Tables can be created using the builtin `Tex::Table` class. You should pass a square 2D array
+```ruby
+
+```
+
+# Using Rbt
+
 In addition, there are several Mathematica-esque modules built into RbTeX that contribute to
 the whole "this is really just a calculator" philosophy. All inputs to the `Rbt` module are
 formatted as TeX code, and all the functions return TeX code.

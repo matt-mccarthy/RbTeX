@@ -1,5 +1,8 @@
 #!/usr/local/bin/ruby
 
+require 'colorize'
+require 'open5'
+
 ################################################################################
 #
 # rblatex -- The RbTeX processor.
@@ -46,9 +49,22 @@ OUT_DELIM = "\u00b6".encode('utf-8')
 RB_METHOD_S = "def"
 RB_METHOD_E = "end"
 
+RB_CLASS_CREATE = "new"
+
 RB_KEYWORD_END = [
-    'begin', 'case', 'class', 'def', 'do', 'for', 'if',
-    'module', 'redo','rescue', 'unless', 'until', 'while'
+    'begin',
+    'case',
+    # 'class',
+    'def',
+    'do',
+    'for',
+    'if',
+    # 'module',
+    'redo',
+    'rescue',
+    'unless',
+    'until',
+    'while'
 ]
 
 TEX_MOD = 'Tex.print'
@@ -62,6 +78,7 @@ RBTEX_FILE = "#{File.basename(TEX_FILE,".tex")}.rtx"        # The generated TeX 
 $rbenvs = 0;                                                # The number of rbtex environments found
 $defstack = []                                              # A mechanism for dertermining when fcns end
 $fcnref = {}
+$console = ""
 
 def main
     if TEX_FILE
@@ -71,7 +88,7 @@ def main
         result = preprocess
         if result == 0
             if $rbenvs > 0
-                puts "#{$rbenvs} RbTeX envrioments) found"
+                puts "#{$rbenvs} RbTeX envrioment(s) found"
                 puts 'Beginning interpretation of Ruby code!'
                 result = interp
                 if result == 0
@@ -87,7 +104,8 @@ def main
             end
         else
             puts 'Failed to preprocess for some reason.'
-            puts 'Did you supply a valid file?'
+            # puts 'Output from Ruby is'
+            # puts $console.red
             return 2
         end
         if result == 0
@@ -128,54 +146,12 @@ def preprocess
             end
             if shouldWrite
                 stripped = line.strip
-                # printer.print "#{stripped}"
-                # Check for methods that are already saved and pass them the line
-                # Suppose we have a method as such:
-                # => def doThing stuff
-                # RbTeX will parse it as
-                # => def doThing stuff, rbtexinsertedlinenumber
-                #
-                # Suppose the user calls it like
-                # => doThing myThing
-                # Then RbTeX simply needs to append the line number as
-                # => doThing myThing, lineno
-                #
-                # Suppose the user called it like
-                # => doThing(myThing)
-                # Then RbTeX needs to see through the paretheses and parse it as
-                # => doThing(myThing, lineno)
-                #
-                # Suppose the user has nested functions
-                # => doThing(doOtherThing mything)
-                # Then RbTeX needs to add more paretheses and append the line
-                # => doThing((doOtherThing myThing), lineno)
-                # $fcnref.each do |fcn, args|
-                #     if stripped.include? fcn
-                #         puts "FOUND #{fcn}"
-                #         if (line.include? '(') && (line.include? ')')
-                #
-                #         else
-                #             puts "Printing #{fcn}, #{lineno}"
-                #             printer.print args != 0 ? ", #{lineno}" : " #{lineno}"
-                #         end
-                #     end
-                # end
-                # A free floating Tex.print line can be formatted as
-                #
-                # => Tex.print thing
-                # => Tex.print (thing)
-                # => Tex.print (Tex.doOtherThing otherThing)
-                #
-                # As a result, we need to inject the line number in by inserting it into the
-                # outermost set of parethesees as such:
-                #
-                # => Tex.print thing, line
-                # => Tex.print (thing, line)
-                # => Tex.print ((Tex.doOtherThing otherThing),line)
                 if (stripped.include? TEX_MOD) && !determineRubyCommented(stripped, TEX_MOD) && !inFunction
                     printer.print appendLineNumberToTexPrintCall(stripped, lineno)
+                elsif (stripped.include? RB_CLASS_CREATE) && !determineRubyCommented(stripped, RB_CLASS_CREATE) && !inFunction
+                    printer.print appendLineNumberToInitialization(stripped, lineno)
                 elsif (stripped.include? RB_METHOD_S) && !determineRubyCommented(stripped, RB_METHOD_S) && !inFunction
-                    puts "Processing function definition"
+                    puts "Processing function definition: found line containing #{stripped}"
                     inFunction = true
                     extracted = extractFunctionMeta stripped
                     $fcnref.store(extracted[0], extracted[1])
@@ -205,7 +181,7 @@ def preprocess
                     end
                     inFunction = $defstack.any?
                 else
-                    puts "STRIPPED: #{stripped}"
+                    print "STRIPPED: #{stripped}\t"
                     deffed = false
                     printer.print stripped
                     $fcnref.each do |fcn, args|
@@ -242,10 +218,8 @@ end
 ################################################################################
 def interp
     rboutput = `ruby #{RB_FILE} #{RBTEX_OUT}`
-    if rboutput != ''
-        puts rboutput
-    else
-        puts 'No output produced by ruby for your viewing pleasure. Moving on...'
+    if rboutput == ''
+        puts 'Your ruby file had no puts statments'.green
     end
     return 0
 end
@@ -338,8 +312,15 @@ def determineRubyCommented(line, haystack)
     return false
 end
 
+################################################################################
+# def extractFunctionMeta(line)
+#
+# Pulls out the function name and the number of arguments, and returns both.
+#
+# Methods in ruby can be formatted in several ways, so this method needs to
+# be able to parse out any of the different variations
+################################################################################
 def extractFunctionMeta(line)
-    # puts "LINE #{line}"
     res = ""
     numret = 0
     if line.include? '('
@@ -368,7 +349,7 @@ def appendLineNumberToTexPrintCall(line, number)
         # => Tex.print thing
         # Output: Tex.print((thing), lineno)
         mline = line.gsub(/\s+/, "")
-        return "#{TEX_MOD}(#{mline[9..mline.length]},#{number})"
+        return "#{TEX_MOD}(#{mline[9..(mline.length-1)]},#{number})"
     # end
 end
 
@@ -391,7 +372,7 @@ def appendLineNumberArgToFunctionDefinition(line)
             return "def #{defgone[0..(defgone.index('(') - 1)]} #{RBTEX_INSERT_LINE}"
         else
             #case 2
-            return "def #{defgone[0..(defgone.index('(') -                                      1)]}(#{defgone[defgone.index('(')..defgone.length]},#{RBTEX_INSERT_LINE}"
+            return "def #{defgone[0..(defgone.index('(') -                                      1)]}(#{defgone[defgone.index('(')..defgone.length]},#{RBTEX_INSERT_LINE})"
         end
     else
         #either have case 1 or 3
@@ -403,6 +384,19 @@ def appendLineNumberArgToFunctionDefinition(line)
             return "def #{defgone} #{RBTEX_INSERT_LINE}"
         end
     end
+end
+
+def appendLineNumberToInitialization(line, number)
+    newSpot = line.index(RB_CLASS_CREATE)
+    args = line[(newSpot + 3)..line.length].strip
+    defin = line[0..(newSpot + 3)].strip
+    if args.length != 0
+        return "#{defin}(#{args},#{number})"
+    else
+        return "#{defin}(#{number})"
+    end
+    # mline = line.gsub(/\s+/, "")
+    # return "#{TEX_MOD}(#{mline[9..(mline.length-1)]},#{number})"
 end
 
 main
